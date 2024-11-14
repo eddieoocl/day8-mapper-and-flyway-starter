@@ -7,6 +7,8 @@ import com.oocl.springbootemployee.model.Employee;
 import com.oocl.springbootemployee.model.Gender;
 import com.oocl.springbootemployee.repository.EmployeeRepository;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,15 +27,15 @@ public class EmployeeService {
         return employeeRepository.findAllByGender(gender);
     }
 
-    public List<Employee> findAll(Integer page, Integer pageSize) {
-        return employeeRepository.findAllByPage(page, pageSize);
+    public Page<Employee> findAll(Integer page, Integer pageSize) {
+        return employeeRepository.findAll(PageRequest.of(page, pageSize));
     }
 
     public Employee findById(Integer employeeId) {
-        return employeeRepository.findById(employeeId);
+        return employeeRepository.findById(employeeId).orElseThrow();
     }
 
-    public Employee creat(Employee employee) {
+    public Employee create(Employee employee) {
         if (employee.getAge() < 18 || employee.getAge() > 65) {
             throw new EmployeeAgeNotValidException();
         }
@@ -42,16 +44,17 @@ public class EmployeeService {
         }
 
         employee.setActive(true);
-        return employeeRepository.create(employee);
+        return employeeRepository.save(employee);
     }
 
     public Employee update(Integer employeeId, Employee employee) {
-        Employee employeeExisted = employeeRepository.findById(employeeId);
+        Employee employeeExisted = employeeRepository.findById(employeeId).orElseThrow();
         if (!employeeExisted.getActive()) {
             throw new EmployeeInactiveException();
         }
 
-        return employeeRepository.update(employeeId, employee);
+        employeeExisted.update(employee);
+        return employeeRepository.save(employeeExisted);
     }
 
     public void delete(Integer employeeId) {

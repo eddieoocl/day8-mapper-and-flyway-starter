@@ -16,9 +16,7 @@ public class Employee {
     private Double salary;
     private Boolean isActive = true;
 
-    public Employee(Integer id, String name, Integer age, Gender gender, Double salary) {
-
-        this.id = id;
+    public Employee(String name, Integer age, Gender gender, Double salary) {
         this.name = name;
         this.age = age;
         this.gender = gender;
@@ -27,6 +25,21 @@ public class Employee {
 
     public Employee() {
 
+    }
+
+    public void update(Employee employee) {
+        if (employee.getName() != null) {
+            this.setName(employee.getName());
+        }
+        if (employee.getAge() != null) {
+            this.setAge(employee.getAge());
+        }
+        if (employee.getGender() != null) {
+            this.setGender(employee.getGender());
+        }
+        if (employee.getSalary() != null) {
+            this.setSalary(employee.getSalary());
+        }
     }
 
     public Integer getId() {

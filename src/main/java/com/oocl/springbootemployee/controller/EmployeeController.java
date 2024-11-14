@@ -1,11 +1,11 @@
 package com.oocl.springbootemployee.controller;
 
 
-import java.util.List;
-
 import com.oocl.springbootemployee.model.Employee;
 import com.oocl.springbootemployee.model.Gender;
 import com.oocl.springbootemployee.service.EmployeeService;
+import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +46,7 @@ public class EmployeeController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Employee addEmployee(@RequestBody Employee employee) {
-        return employeeService.creat(employee);
+        return employeeService.create(employee);
     }
 
     @PutMapping("/{id}")
@@ -61,7 +61,7 @@ public class EmployeeController {
     }
 
     @GetMapping(params = {"pageIndex", "pageSize"})
-    public List<Employee> getAllByPageSize(@RequestParam Integer pageIndex, @RequestParam Integer pageSize){
+    public Page<Employee> getAllByPageSize(@RequestParam Integer pageIndex, @RequestParam Integer pageSize){
         return employeeService.findAll(pageIndex, pageSize);
     }
 }

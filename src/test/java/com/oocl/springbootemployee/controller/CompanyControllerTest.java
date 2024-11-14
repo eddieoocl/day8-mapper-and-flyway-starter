@@ -41,13 +41,13 @@ public class CompanyControllerTest {
     void setUp() {
         companyRepository.findAll().clear();
         companyRepository.addCompany(new Company(1, "Acme Corporation", List.of(
-            new Employee(1, "John Smith", 32, Gender.MALE, 5000.0),
-            new Employee(2, "Jane Johnson", 28, Gender.FEMALE, 6000.0)
+            new Employee("John Smith", 32, Gender.MALE, 5000.0),
+            new Employee("Jane Johnson", 28, Gender.FEMALE, 6000.0)
         )));
         companyRepository.addCompany(new Company(2, "TechCom Solutions", List.of(
-            new Employee(3, "David Williams", 35, Gender.MALE, 5500.0),
-            new Employee(4, "Emily Brown", 23, Gender.FEMALE, 4500.0),
-            new Employee(5, "Michael Jones", 40, Gender.MALE, 7000.0)
+            new Employee("David Williams", 35, Gender.MALE, 5500.0),
+            new Employee("Emily Brown", 23, Gender.FEMALE, 4500.0),
+            new Employee("Michael Jones", 40, Gender.MALE, 7000.0)
         )));
         companyRepository.addCompany(new Company("Global Innovators"));
         companyRepository.addCompany(new Company("Stellar Enterprises"));

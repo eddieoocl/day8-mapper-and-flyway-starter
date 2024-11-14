@@ -17,13 +17,13 @@ public class CompanyRepository {
 
     CompanyRepository() {
         List<Employee> employeesInSpring = new ArrayList<>();
-        employeesInSpring.add(new Employee(1, "alice", 21, Gender.FEMALE, 6000.0));
-        employeesInSpring.add(new Employee(2, "bob", 20, Gender.MALE, 6200.0));
-        employeesInSpring.add(new Employee(3, "charles", 22, Gender.MALE, 5800.0));
+        employeesInSpring.add(new Employee("alice", 21, Gender.FEMALE, 6000.0));
+        employeesInSpring.add(new Employee("bob", 20, Gender.MALE, 6200.0));
+        employeesInSpring.add(new Employee("charles", 22, Gender.MALE, 5800.0));
 
         List<Employee> employeesInBoot = new ArrayList<>();
-        employeesInBoot.add(new Employee(1, "daisy", 22, Gender.FEMALE, 6100.0));
-        employeesInBoot.add(new Employee(2, "ethan", 19, Gender.MALE, 6000.0));
+        employeesInBoot.add(new Employee("daisy", 22, Gender.FEMALE, 6100.0));
+        employeesInBoot.add(new Employee("ethan", 19, Gender.MALE, 6000.0));
 
         this.companies.add(new Company(1, "spring", employeesInSpring));
         this.companies.add(new Company(2, "boot", employeesInBoot));

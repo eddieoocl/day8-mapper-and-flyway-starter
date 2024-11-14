@@ -6,6 +6,7 @@ import com.oocl.springbootemployee.exception.EmployeeInactiveException;
 import com.oocl.springbootemployee.model.Employee;
 import com.oocl.springbootemployee.model.Gender;
 import com.oocl.springbootemployee.repository.EmployeeRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,7 +21,7 @@ class EmployeeServiceTest {
     void should_return_the_given_employees_when_getAllEmployees() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        when(mockedEmployeeRepository.findAll()).thenReturn(List.of(new Employee(1, "Lucy", 18, Gender.FEMALE, 8000.0)));
+        when(mockedEmployeeRepository.findAll()).thenReturn(List.of(new Employee("Lucy", 18, Gender.FEMALE, 8000.0)));
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
 
         //when
@@ -32,79 +33,79 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void should_return_the_created_employee_when_create_given_a_employee() {
+    void should_return_the_saved_employee_when_save_given_a_employee() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        Employee lucy = new Employee(1, "Lucy", 18, Gender.FEMALE, 8000.0);
-        when(mockedEmployeeRepository.create(any())).thenReturn(lucy);
+        Employee lucy = new Employee("Lucy", 18, Gender.FEMALE, 8000.0);
+        when(mockedEmployeeRepository.save(any())).thenReturn(lucy);
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
 
         //when
-        Employee createdEmployee = employeeService.creat(lucy);
+        Employee savedEmployee = employeeService.create(lucy);
 
         //then
-        assertEquals("Lucy", createdEmployee.getName());
+        assertEquals("Lucy", savedEmployee.getName());
     }
 
     @Test
-    void should_throw_EmployeeAgeNotValidException_when_create_given_a_employee_with_age_17() {
+    void should_throw_EmployeeAgeNotValidException_when_save_given_a_employee_with_age_17() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        Employee kitty = new Employee(1, "Kitty", 6, Gender.FEMALE, 8000.0);
+        Employee kitty = new Employee("Kitty", 6, Gender.FEMALE, 8000.0);
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
         //when
         //then
-        assertThrows(EmployeeAgeNotValidException.class, () -> employeeService.creat(kitty));
-        verify(mockedEmployeeRepository, never()).create(any());
+        assertThrows(EmployeeAgeNotValidException.class, () -> employeeService.create(kitty));
+        verify(mockedEmployeeRepository, never()).save(any());
     }
 
     @Test
-    void should_throw_EmployeeAgeNotValidException_when_create_given_a_employee_with_age_66() {
+    void should_throw_EmployeeAgeNotValidException_when_save_given_a_employee_with_age_66() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        Employee kitty = new Employee(1, "Kitty", 66, Gender.FEMALE, 8000.0);
+        Employee kitty = new Employee("Kitty", 66, Gender.FEMALE, 8000.0);
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
         //when
         //then
-        assertThrows(EmployeeAgeNotValidException.class, () -> employeeService.creat(kitty));
-        verify(mockedEmployeeRepository, never()).create(any());
+        assertThrows(EmployeeAgeNotValidException.class, () -> employeeService.create(kitty));
+        verify(mockedEmployeeRepository, never()).save(any());
     }
 
     @Test
-    void should_created_employee_active_when_create_employee() {
+    void should_saved_employee_active_when_save_employee() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
-        Employee lucy = new Employee(1, "Lucy", 18, Gender.FEMALE, 8000.0);
+        Employee lucy = new Employee("Lucy", 18, Gender.FEMALE, 8000.0);
         //when
-        employeeService.creat(lucy);
+        employeeService.create(lucy);
         /* then */
-        verify(mockedEmployeeRepository).create(argThat(Employee::getActive));
+        verify(mockedEmployeeRepository).save(argThat(Employee::getActive));
     }
 
     @Test
-    void should_throw_EmployeeAgeSalaryNotMatchedException_when_create_given_a_employee_with_age_over_30_and_salary_below_20K() {
+    void should_throw_EmployeeAgeSalaryNotMatchedException_when_save_given_a_employee_with_age_over_30_and_salary_below_20K() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        Employee bob = new Employee(1, "Bob", 31, Gender.FEMALE, 8000.0);
+        Employee bob = new Employee("Bob", 31, Gender.FEMALE, 8000.0);
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
         //when
         //then
-        assertThrows(EmployeeAgeSalaryNotMatchedException.class, () -> employeeService.creat(bob));
-        verify(mockedEmployeeRepository, never()).create(any());
+        assertThrows(EmployeeAgeSalaryNotMatchedException.class, () -> employeeService.create(bob));
+        verify(mockedEmployeeRepository, never()).save(any());
     }
 
     @Test
     void should_throw_EmployeeInactiveException_when_update_inactive_employee() {
         //given
         EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-        Employee inactiveEmployee = new Employee(1, "Bob", 31, Gender.FEMALE, 8000.0);
+        Employee inactiveEmployee = new Employee("Bob", 31, Gender.FEMALE, 8000.0);
         inactiveEmployee.setActive(false);
-        when(mockedEmployeeRepository.findById(1)).thenReturn(inactiveEmployee);
+        when(mockedEmployeeRepository.findById(1)).thenReturn(Optional.of(inactiveEmployee));
         EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
         //when
         //then
         assertThrows(EmployeeInactiveException.class, () -> employeeService.update(1, inactiveEmployee));
-        verify(mockedEmployeeRepository, never()).update(anyInt(), any());
+        verify(mockedEmployeeRepository, never()).save(any());
     }
 }
