@@ -5,14 +5,15 @@ import com.oocl.springbootemployee.exception.EmployeeAgeSalaryNotMatchedExceptio
 import com.oocl.springbootemployee.exception.EmployeeInactiveException;
 import com.oocl.springbootemployee.model.Employee;
 import com.oocl.springbootemployee.model.Gender;
-import com.oocl.springbootemployee.repository.IEmployeeRepository;
+import com.oocl.springbootemployee.repository.EmployeeRepository;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 @Service
 public class EmployeeService {
-    private final IEmployeeRepository employeeRepository;
-    public EmployeeService(IEmployeeRepository employeeRepository) {
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
@@ -33,19 +34,22 @@ public class EmployeeService {
     }
 
     public Employee creat(Employee employee) {
-        if(employee.getAge() < 18 || employee.getAge() > 65)
+        if (employee.getAge() < 18 || employee.getAge() > 65) {
             throw new EmployeeAgeNotValidException();
-        if(employee.getAge() >= 30 && employee.getSalary() < 20000.0)
+        }
+        if (employee.getAge() >= 30 && employee.getSalary() < 20000.0) {
             throw new EmployeeAgeSalaryNotMatchedException();
+        }
 
         employee.setActive(true);
         return employeeRepository.create(employee);
     }
 
-    public Employee update(Integer employeeId , Employee employee) {
+    public Employee update(Integer employeeId, Employee employee) {
         Employee employeeExisted = employeeRepository.findById(employeeId);
-        if(!employeeExisted.getActive())
+        if (!employeeExisted.getActive()) {
             throw new EmployeeInactiveException();
+        }
 
         return employeeRepository.update(employeeId, employee);
     }

@@ -14,7 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,12 +24,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTest({CompanyController.class, CompanyRepository.class})
+@SpringBootTest
+@AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 public class CompanyControllerTest {
     @Autowired
     private MockMvc client;
-
     @Autowired
     private CompanyRepository companyRepository;
     @Autowired
@@ -38,7 +39,7 @@ public class CompanyControllerTest {
 
     @BeforeEach
     void setUp() {
-        companyRepository.getAll().clear();
+        companyRepository.findAll().clear();
         companyRepository.addCompany(new Company(1, "Acme Corporation", List.of(
             new Employee(1, "John Smith", 32, Gender.MALE, 5000.0),
             new Employee(2, "Jane Johnson", 28, Gender.FEMALE, 6000.0)
@@ -56,7 +57,7 @@ public class CompanyControllerTest {
     @Test
     void should_return_all_companies() throws Exception {
         // Given
-        final List<Company> givenCompanies = companyRepository.getAll();
+        final List<Company> givenCompanies = companyRepository.findAll();
 
         // When
         final MvcResult result = client.perform(MockMvcRequestBuilders.get("/companies")).andReturn();
@@ -90,7 +91,7 @@ public class CompanyControllerTest {
         // Given
         var pageIndex = 3;
         var pageSize = 2;
-        final var the5thEmployeeCompanyInPage3 = companyRepository.getCompanyById(5);
+        final var the5thEmployeeCompanyInPage3 = companyRepository.findById(5);
 
         // When
         // Then
@@ -115,7 +116,7 @@ public class CompanyControllerTest {
         assertThat(result.getResponse().getContentType()).isEqualTo(MediaType.APPLICATION_JSON.toString());
         final List<Employee> fetchedEmployees =
             employeeListJacksonTester.parseObject(result.getResponse().getContentAsString());
-        final List<Employee> givenEmployees = companyRepository.getCompanyById(givenCompanyId).getEmployees();
+        final List<Employee> givenEmployees = companyRepository.findById(givenCompanyId).getEmployees();
         for (int i = 0; i < fetchedEmployees.size(); i++) {
             final var fetchedEmployee = fetchedEmployees.get(i);
             final var givenEmployee = givenEmployees.get(i);
@@ -131,7 +132,7 @@ public class CompanyControllerTest {
     void should_return_company_when_get_by_id() throws Exception {
         // Given
         var companyId = 1;
-        final var companyGiven = companyRepository.getCompanyById(companyId);
+        final var companyGiven = companyRepository.findById(companyId);
 
         // When
         // Then
@@ -187,6 +188,6 @@ public class CompanyControllerTest {
 
         // Then
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        assertThat(companyRepository.getAll()).hasSize(4);
+        assertThat(companyRepository.findAll()).hasSize(4);
     }
 }
