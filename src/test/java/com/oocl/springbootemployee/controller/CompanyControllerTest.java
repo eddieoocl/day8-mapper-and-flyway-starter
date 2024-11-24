@@ -10,6 +10,7 @@ import com.oocl.springbootemployee.model.Gender;
 import com.oocl.springbootemployee.repository.CompanyRepository;
 import com.oocl.springbootemployee.repository.EmployeeRepository;
 import java.util.List;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -78,28 +80,21 @@ class CompanyControllerTest {
 
         // When
         final MvcResult result = client.perform(MockMvcRequestBuilders.get("/companies")).andReturn();
+        final MockHttpServletResponse response = result.getResponse();
 
         // Then
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentType()).isEqualTo(MediaType.APPLICATION_JSON.toString());
-        final List<Company> fetchedCompanies = companyListJacksonTester.parseObject(result.getResponse().getContentAsString());
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON.toString());
+        final List<Company> fetchedCompanies = companyListJacksonTester.parseObject(response.getContentAsString());
         assertThat(fetchedCompanies).hasSameSizeAs(givenCompanies);
-        for (int i = 0; i < fetchedCompanies.size(); i++) {
-            final Company fetchedCompany = fetchedCompanies.get(i);
-            final Company givenCompany = givenCompanies.get(i);
-            assertThat(fetchedCompany.getId()).isEqualTo(givenCompany.getId());
-            assertThat(fetchedCompany.getName()).isEqualTo(givenCompany.getName());
-            assertThat(fetchedCompany.getEmployees()).hasSize(givenCompany.getEmployees().size());
-            for (int j = 0; j < fetchedCompany.getEmployees().size(); j++) {
-                final Employee fetchedEmployee = fetchedCompany.getEmployees().get(i);
-                final Employee givenEmployee = givenCompany.getEmployees().get(i);
-                assertThat(fetchedEmployee.getId()).isEqualTo(givenEmployee.getId());
-                assertThat(fetchedEmployee.getName()).isEqualTo(givenEmployee.getName());
-                assertThat(fetchedEmployee.getAge()).isEqualTo(givenEmployee.getAge());
-                assertThat(fetchedEmployee.getGender()).isEqualTo(givenEmployee.getGender());
-                assertThat(fetchedEmployee.getSalary()).isEqualTo(givenEmployee.getSalary());
-            }
-        }
+        assertThat(fetchedCompanies)
+            .usingRecursiveComparison(
+                RecursiveComparisonConfiguration.builder()
+                    .withComparedFields("name", "employees")
+                    .withComparedFields("employees.id", "employees.age", "employees.name", "employees.gender")
+                    .build()
+            )
+            .isEqualTo(givenCompanies);
     }
 
     @Test
