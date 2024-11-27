@@ -24,13 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService) {
+    private final EmployeeMapper employeeMapper;
+
+    public EmployeeController(EmployeeService employeeService, EmployeeMapper employeeMapper) {
         this.employeeService = employeeService;
+        this.employeeMapper = employeeMapper;
     }
 
     @GetMapping
-    public List<Employee> getEmployeeList() {
-        return employeeService.findAll();
+    public List<EmployeeResponse> getEmployeeList() {
+        return employeeMapper.toResponse(employeeService.findAll());
     }
 
     @GetMapping("/{id}")
